@@ -2,8 +2,13 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-//import ApolloServer
 
+//import typedefs and resolvers
+const TypeDefs = require('./schema')
+const Resolvers = require('./resolvers')
+
+//import ApolloServer
+const { ApolloServer } = require('apollo-server-express')
 
 //Store sensitive information to env variables
 const dotenv = require('dotenv');
@@ -23,7 +28,10 @@ mongoose.connect(mongodb_atlas_url, {
 });
 
 //Define Apollo Server
-
+const server = new ApolloServer({
+  typeDefs: TypeDefs.typeDefs,
+  resolvers: Resolvers.resolvers
+})
 
 //Define Express Server
 const app = express();
@@ -31,7 +39,9 @@ app.use(bodyParser.json());
 app.use('*', cors());
 
 //Add Express app as middleware to Apollo Server
+server.applyMiddleware({app})
 
+//console.log(server)
 
 //Start listen 
 app.listen({ port: process.env.PORT }, () =>
